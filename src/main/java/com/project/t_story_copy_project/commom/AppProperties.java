@@ -1,6 +1,5 @@
 package com.project.t_story_copy_project.commom;
 
-import io.jsonwebtoken.Jwt;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

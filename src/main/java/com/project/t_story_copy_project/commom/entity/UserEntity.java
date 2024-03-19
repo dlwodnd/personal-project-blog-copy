@@ -4,13 +4,14 @@ import com.project.t_story_copy_project.commom.entity.base.BaseEntity;
 import com.project.t_story_copy_project.commom.entity.jpa_enum.SocialEnum;
 import com.project.t_story_copy_project.commom.entity.jpa_enum.UserRoleEnum;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "t_user"
