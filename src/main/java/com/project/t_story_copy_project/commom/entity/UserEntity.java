@@ -38,7 +38,6 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false)
     private String userName;
 
-    @Column(nullable = false)
     private String userPic;
 
     @Column(nullable = false)
@@ -55,28 +54,12 @@ public class UserEntity extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userEntity",cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<BlogEntity> blogEntityList = new ArrayList<>();
 
-    public UserEntity changeNickname(String newNickname) {
-        return UserEntity.builder()
-                .userPk(this.userPk)
-                .userEmail(this.userEmail)
-                .userPw(this.userPw)
-                .userName(this.userName)
-                .userPic(this.userPic)
-                .nickname(newNickname)
-                .socialType(this.socialType)
-                .build();
+    public void changeNickname(String newNickname) {
+        this.nickname = newNickname;
     }
 
-    public UserEntity changeUserPic(String newUserPic) {
-        return UserEntity.builder()
-                .userPk(this.userPk)
-                .userEmail(this.userEmail)
-                .userPw(this.userPw)
-                .userName(this.userName)
-                .userPic(newUserPic)
-                .nickname(this.nickname)
-                .socialType(this.socialType)
-                .build();
+    public void changeUserPic(String newUserPic) {
+        this.userPic = newUserPic;
     }
 
 

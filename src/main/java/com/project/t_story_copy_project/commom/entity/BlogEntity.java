@@ -1,5 +1,6 @@
 package com.project.t_story_copy_project.commom.entity;
 
+import com.project.t_story_copy_project.blog.models.dto.BlogModifyDto;
 import com.project.t_story_copy_project.commom.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,18 +30,18 @@ public class BlogEntity extends BaseEntity {
 
     private String blogInfo;
 
-    @Column(nullable = false)
+    @Column(nullable = false,updatable = false,unique = true)
     private String blogAddress;
 
-    @Column(nullable = false)
     private String blogPic;
 
-    @ColumnDefault("'0'")
     @Column(nullable = false)
+    private String blogNickname;
+
+    @ColumnDefault("'0'")
     private Long blogRep;
 
     @ColumnDefault("'0'")
-    @Column(nullable = false)
     private Long cmtOnlyLogin;
 
     /*@ColumnDefault("'0'")
@@ -51,5 +52,18 @@ public class BlogEntity extends BaseEntity {
     @Column(nullable = false)
     private Long guestBookOnlyLogin;*/
 
-
+    public void changeBlogPic (String saveFileName) {
+        this.blogPic = saveFileName;
+    }
+    public void modifyBlogInfo(BlogModifyDto dto){
+        if(!dto.getBlogInfo().isEmpty()){
+            this.blogInfo = dto.getBlogInfo();
+        }
+        if (!dto.getBlogNickname().isEmpty()){
+            this.blogNickname = dto.getBlogNickname();
+        }
+        if (!dto.getBlogTitle().isEmpty()){
+            this.blogTitle = dto.getBlogTitle();
+        }
+    }
 }

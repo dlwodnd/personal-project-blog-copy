@@ -9,6 +9,7 @@ import com.project.t_story_copy_project.commom.exception.UserErrorCode;
 import com.project.t_story_copy_project.commom.repository.UserRepository;
 import com.project.t_story_copy_project.commom.utils.CookieUtils;
 import com.project.t_story_copy_project.commom.utils.MyFileUtils;
+import com.project.t_story_copy_project.commom.utils.RedisUtils;
 import com.project.t_story_copy_project.security.AuthenticationFacade;
 import com.project.t_story_copy_project.security.JwtTokenProvider;
 import com.project.t_story_copy_project.security.MyPrincipal;
@@ -20,11 +21,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final RedisUtils redisUtils;
     private final UserRepository userRepository;
     private final MyFileUtils myFileUtils;
     private final CookieUtils cookieUtils;
@@ -33,15 +36,15 @@ public class UserService {
     private final AppProperties appProperties;
     private final AuthenticationFacade authenticationFacade;
 
-
+    @Transactional
     public void userSignUp(UserSingUpDto dto, MultipartFile profileImg){
         UserEntity userEntity = UserEntity.builder()
                 .userEmail(dto.getEmailCertificationVo().getEmail())
                 .userPw(passwordEncoder.encode(dto.getPassword()))
-                .userPic(null)
                 .role(UserRoleEnum.USER)
                 .socialType(SocialEnum.NORMAL)
                 .userName(dto.getName())
+                .nickname(dto.getNickname())
                 .build();
         userRepository.save(userEntity);
         if (profileImg != null) {
@@ -49,8 +52,10 @@ public class UserService {
             String fileNm = myFileUtils.transferTo(profileImg, target);
             userEntity.changeUserPic(fileNm);
         }
+        redisUtils.deleteData(userEntity.getUserEmail());
 
     }
+    @Transactional
     public UserLoginVo userLogin(HttpServletRequest request, HttpServletResponse response, UserLoginDto dto){
         UserEntity userEntity = userRepository.findByUserEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
@@ -73,6 +78,7 @@ public class UserService {
                 .accessToken(at)
                 .build();
     }
+    @Transactional
     public String changeProfilePic(MultipartFile profileImg){
         UserEntity userEntity = userRepository.findById(authenticationFacade.getLoginUserPk())
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));

@@ -21,29 +21,24 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")//유저 회원가입
-    public ResponseEntity<String> userSignUp(@Valid @RequestPart UserSingUpDto dto
+    public ResponseEntity<CustomResponse<Void>> userSignUp(@Valid @RequestPart UserSingUpDto dto
             , @RequestPart(required = false) MultipartFile profileImg){
         userService.userSignUp(dto,profileImg);
-        return ResponseEntity.ok("회원가입 성공");
+        return ResponseEntity.ok(new CustomResponse<>());
     }
     @PostMapping("/login") //유저 로그인
     public ResponseEntity<CustomResponse<UserLoginVo>> userLogin(HttpServletRequest request
             , HttpServletResponse response
             , @Valid @RequestBody UserLoginDto dto){
         UserLoginVo userLoginVo = userService.userLogin(request,response,dto);
-        CustomResponse<UserLoginVo> customResponse = CustomResponse.<UserLoginVo>builder()
-                .codeNum("200")
-                .message("Login successful")
-                .data(userLoginVo)
-                .build();
+        CustomResponse<UserLoginVo> customResponse = new CustomResponse<>(userLoginVo);
         return ResponseEntity.ok(customResponse);
     }
     @PatchMapping("/profile-pic")
     public ResponseEntity<CustomResponse<String>> changeProfilePic(@RequestPart MultipartFile profileImg){
-        String savefile = userService.changeProfilePic(profileImg);
-        return ResponseEntity.ok(CustomResponse.<String>builder()
-                .data(savefile)
-                .build());
+        String saveFile = userService.changeProfilePic(profileImg);
+        CustomResponse<String> customResponse = new CustomResponse<>(saveFile);
+        return ResponseEntity.ok(customResponse);
     }
 
     @GetMapping("/nickname-check")//닉네임 중복체크
@@ -52,7 +47,7 @@ public class UserController {
         if (!result){
             throw new CustomException(UserErrorCode.DUPLICATION_NICKNAME);
         }
-        return ResponseEntity.ok(CustomResponse.<String>builder()
-                .data("중복없음").build());
+        CustomResponse<String> customResponse = new CustomResponse<>(nickname);
+        return ResponseEntity.ok(customResponse);
     }
 }

@@ -8,6 +8,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ import static io.jsonwebtoken.Jwts.claims;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
     private final ObjectMapper objectMapper;
     private final AppProperties appProperties;
@@ -42,8 +44,11 @@ public class JwtTokenProvider {
     }
     public String resolveToken(HttpServletRequest request){
         String auth = request.getHeader(appProperties.getJwt().getHeaderSchemeName());
-        if(auth.startsWith(appProperties.getJwt().getHeaderSchemeName())){
-            return auth.substring(appProperties.getJwt().getHeaderSchemeName().length()).trim();
+        if(auth == null){
+            return null;
+        }
+        if(auth.startsWith(appProperties.getJwt().getTokenType())){
+            return auth.substring(appProperties.getJwt().getTokenType().length()).trim();
         }
         return null;
     }
