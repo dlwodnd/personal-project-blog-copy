@@ -60,4 +60,9 @@ public class FeedController {
     public ResponseEntity<CustomResponse<ResVo>> putFeed(@RequestBody FeedInsDto dto){
         return ResponseEntity.ok(new CustomResponse<>(feedService.putFeed(dto)));
     }
+    //피드 좋아요
+    @PatchMapping("/fav")
+    public ResponseEntity<CustomResponse<ResVo>> patchFeedFav(@RequestParam Long feedPk){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.patchFeedFav(feedPk)));
+    }
 }

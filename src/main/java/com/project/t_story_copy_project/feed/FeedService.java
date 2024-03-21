@@ -3,6 +3,7 @@ package com.project.t_story_copy_project.feed;
 import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
 import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.entity.*;
+import com.project.t_story_copy_project.commom.entity.embeddable.FeedFavComposite;
 import com.project.t_story_copy_project.commom.exception.BlogErrorCode;
 import com.project.t_story_copy_project.commom.exception.CustomException;
 import com.project.t_story_copy_project.commom.exception.FeedErrorCode;
@@ -145,6 +146,32 @@ public class FeedService {
         feedEntity.modifyHashTagEntityList(hashTagEntityList);
         return new ResVo(1L);
     }
+    //피드 좋아요
+    public ResVo patchFeedFav(long feedPk){
+        FeedEntity feedEntity = feedRepository.findById(feedPk)
+                .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED));
+        UserEntity userEntity = checkUser();
+        FeedFavComposite feedFavComposite = FeedFavComposite.builder()
+                .feedPk(feedEntity.getFeedPk())
+                .userPk(userEntity.getUserPk())
+                .build();
+        FeedFavEntity feedFavEntity = feedFavRepository.findById(feedFavComposite)
+                .orElse(null);
+        if (feedFavEntity == null){
+            feedFavEntity = FeedFavEntity.builder()
+                    .feedFavComposite(feedFavComposite)
+                    .feedEntity(feedEntity)
+                    .userEntity(checkUser())
+                    .build();
+            feedFavRepository.save(feedFavEntity);
+            return new ResVo(1L);
+        }
+        else {
+            feedFavRepository.delete(feedFavEntity);
+            return new ResVo(2L);
+        }
+
+    }
 
 
 
@@ -170,6 +197,7 @@ public class FeedService {
         return userRepository.findById(authenticationFacade.getLoginUserPk())
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND_USER));
     }
+
 
 
 }
