@@ -1,6 +1,5 @@
 package com.project.t_story_copy_project.feed;
 
-import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
 import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.entity.*;
 import com.project.t_story_copy_project.commom.entity.embeddable.FeedFavComposite;
@@ -10,6 +9,7 @@ import com.project.t_story_copy_project.commom.exception.FeedErrorCode;
 import com.project.t_story_copy_project.commom.exception.UserErrorCode;
 import com.project.t_story_copy_project.commom.repository.*;
 import com.project.t_story_copy_project.commom.utils.MyFileUtils;
+import com.project.t_story_copy_project.feed.models.dto.FeedCmtInsDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
 import com.project.t_story_copy_project.feed.models.vo.*;
 import com.project.t_story_copy_project.security.AuthenticationFacade;
@@ -171,6 +171,40 @@ public class FeedService {
             return new ResVo(2L);
         }
 
+    }
+    public ResVo postFeedCmt(FeedCmtInsDto dto) {
+        FeedEntity feedEntity = feedRepository.findById(dto.getFeedPk())
+                .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED));
+        UserEntity userEntity = userRepository.findById(authenticationFacade.getLoginUserPk())
+                .orElse(null);
+        if (userEntity == null){
+            if (feedEntity.getBlogEntity().getCmtOnlyLogin() == 1){
+                throw new CustomException(FeedErrorCode.NEED_LOGIN);
+            }
+            if (dto.getCmtNm() == null || dto.getCmtPw() == null){
+                throw new CustomException(FeedErrorCode.GUEST_USER_NEED_ID_AND_PW);
+            }
+            else {
+                FeedCommentEntity feedCommentEntity = FeedCommentEntity.builder()
+                        .feedEntity(feedEntity)
+                        .cmtPw(dto.getCmtPw())
+                        .cmtNm(dto.getCmtNm())
+                        .cmt(dto.getCmt())
+                        .build();
+                feedCmtRepository.save(feedCommentEntity);
+                return new ResVo(1L);
+            }
+        }
+        else {
+            FeedCommentEntity feedCommentEntity = FeedCommentEntity.builder()
+                    .feedEntity(feedEntity)
+                    .userEntity(userEntity)
+                    .cmt(dto.getCmt())
+                    .cmtPrivate(dto.getCmtPrivate())
+                    .build();
+            feedCmtRepository.save(feedCommentEntity);
+            return new ResVo(1L);
+        }
     }
 
 

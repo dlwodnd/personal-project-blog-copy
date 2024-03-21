@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 @Getter
 public enum FeedErrorCode implements ErrorCode{
+    GUEST_USER_NEED_ID_AND_PW(HttpStatus.UNAUTHORIZED,"게스트 유저는 아이디와 비밀번호를 입력해주세요"),
+    NEED_LOGIN(HttpStatus.UNAUTHORIZED,"로그인이 필요합니다"),
     NOT_FOUND_CAT(HttpStatus.NOT_FOUND,"카테고리를 찾을 수 없습니다."),
     NOT_FOUND_FEED_PIC(HttpStatus.NOT_FOUND,"피드 사진을 찾을 수 없습니다."),
     NOT_FOUND_FEED(HttpStatus.NOT_FOUND,"피드를 찾을 수 없습니다.");

@@ -3,6 +3,7 @@ package com.project.t_story_copy_project.feed;
 import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
 import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.exception.CustomResponse;
+import com.project.t_story_copy_project.feed.models.dto.FeedCmtInsDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
 import com.project.t_story_copy_project.feed.models.vo.CatFeedInfoVo;
 import com.project.t_story_copy_project.feed.models.vo.CatSimpleVo;
@@ -64,5 +65,10 @@ public class FeedController {
     @PatchMapping("/fav")
     public ResponseEntity<CustomResponse<ResVo>> patchFeedFav(@RequestParam Long feedPk){
         return ResponseEntity.ok(new CustomResponse<>(feedService.patchFeedFav(feedPk)));
+    }
+    //피드 댓글 등록
+    @PostMapping("/cmt")
+    public ResponseEntity<CustomResponse<ResVo>> postFeedCmt(@RequestBody FeedCmtInsDto dto){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.postFeedCmt(dto)));
     }
 }
