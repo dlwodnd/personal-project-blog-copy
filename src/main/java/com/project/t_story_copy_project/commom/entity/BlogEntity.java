@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "t_blog")
 @Getter
@@ -52,6 +55,17 @@ public class BlogEntity extends BaseEntity {
     @Column(nullable = false)
     private Long guestBookOnlyLogin;*/
 
+    @OneToMany(mappedBy = "blogEntity"
+            , fetch = FetchType.LAZY
+            , cascade = CascadeType.PERSIST
+            , orphanRemoval = true)
+    private List<CatEntity> catEntityList = new ArrayList<>();
+
+    public void modifyCatEntityList(List<CatEntity> catEntityList){
+        this.catEntityList.clear();
+        this.catEntityList.addAll(catEntityList);
+    }
+
     public void changeBlogPic (String saveFileName) {
         this.blogPic = saveFileName;
     }
@@ -65,5 +79,13 @@ public class BlogEntity extends BaseEntity {
         if (!dto.getBlogTitle().isEmpty()){
             this.blogTitle = dto.getBlogTitle();
         }
+    }
+    public long cmtAccess(){
+        if (this.cmtOnlyLogin == 1L){
+            this.cmtOnlyLogin = 0L;
+            return 2;
+        }
+        this.blogRep = 1L;
+        return 1;
     }
 }

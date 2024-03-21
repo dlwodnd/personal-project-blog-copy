@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlogInfoVo {
-    private long blogPk;
+    private Long blogPk;
     private String blogTitle;
     private String blogAddress;
     private String blogNickname;

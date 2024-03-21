@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class BlogModifyDto {
+@NoArgsConstructor
+public class CatInsDto {
     private Long blogPk;
-    private String blogTitle;
-    private String blogInfo;
-    private String blogNickname;
+    private List<CatInfoDto> catInfoList;
 }

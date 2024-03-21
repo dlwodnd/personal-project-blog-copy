@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class BlogModifyDto {
-    private Long blogPk;
-    private String blogTitle;
-    private String blogInfo;
-    private String blogNickname;
+@NoArgsConstructor
+public class CatInfoDto {
+    private Long catPk;
+    private Long catSeq;
+    private String catName;
+    private Long catOrder;
+    private Long topCatSeq;
 }

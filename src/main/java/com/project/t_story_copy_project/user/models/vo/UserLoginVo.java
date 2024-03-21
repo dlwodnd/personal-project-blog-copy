@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserLoginVo {
-    private long userPk;
+    private Long userPk;
     private String email;
     private String nickname;
     private String accessToken;
