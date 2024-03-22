@@ -7,10 +7,9 @@ import com.project.t_story_copy_project.feed.models.dto.CmtDelGuestDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedCmtInsDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedCmtPutDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
-import com.project.t_story_copy_project.feed.models.vo.CatFeedInfoVo;
-import com.project.t_story_copy_project.feed.models.vo.CatSimpleVo;
-import com.project.t_story_copy_project.feed.models.vo.FeedPicInfoVo;
+import com.project.t_story_copy_project.feed.models.vo.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +24,7 @@ public class FeedController {
 
     //카테고리 리스트 불러오기
     @GetMapping("/category")
-    public ResponseEntity<CustomResponse<List<CatFeedInfoVo>>> getCategory(@RequestParam Long blogPk){
+    public ResponseEntity<CustomResponse<CatVo>> getCategory(@RequestParam Long blogPk){
         return ResponseEntity.ok(new CustomResponse<>(feedService.getCategory(blogPk)));
     }
     //카테고리 이름 pk 불러오기
@@ -84,5 +83,16 @@ public class FeedController {
     @DeleteMapping("/cmt")
     public ResponseEntity<CustomResponse<ResVo>> deleteFeedCmt(@RequestParam Long feedCmtPk, @RequestBody String guestPw){
         return ResponseEntity.ok(new CustomResponse<>(feedService.deleteFeedCmt(feedCmtPk, guestPw)));
+    }
+
+    //전체 피드 리스트 출력
+    @GetMapping("/main")
+    public ResponseEntity<CustomResponse<FeedSimpleInfoVoList>> getFeedList(@RequestParam Pageable pageable){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.getFeedAll(pageable)));
+    }
+    //구독한 블로그 피드 리스트
+    @GetMapping("/sub")
+    public ResponseEntity<CustomResponse<FeedSimpleInfoVoList>> getFeedSubList(@RequestParam Pageable pageable){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.getFeedSub(pageable)));
     }
 }

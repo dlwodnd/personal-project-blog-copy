@@ -6,6 +6,7 @@ import com.project.t_story_copy_project.blog.models.dto.CatInfoDto;
 import com.project.t_story_copy_project.blog.models.dto.CatInsDto;
 import com.project.t_story_copy_project.blog.models.vo.BlogInfoVo;
 import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
+import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.exception.CustomResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -55,5 +56,11 @@ public class BlogController {
     @PatchMapping("/cmtAccess")
     public ResponseEntity<CustomResponse<Long>> cmtAccess(@RequestParam long blogPk){
         return ResponseEntity.ok(new CustomResponse<>(blogService.cmtAccess(blogPk)));
+    }
+
+    //블로그 구독
+    @PostMapping("/subscribe")
+    public ResponseEntity<CustomResponse<ResVo>> subscribe(@RequestParam long blogPk){
+        return ResponseEntity.ok(new CustomResponse<>(blogService.subscribe(blogPk)));
     }
 }

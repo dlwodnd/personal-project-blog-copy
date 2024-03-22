@@ -1,5 +1,6 @@
 package com.project.t_story_copy_project.feed;
 
+import com.project.t_story_copy_project.commom.Const;
 import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.entity.*;
 import com.project.t_story_copy_project.commom.entity.embeddable.FeedFavComposite;
@@ -16,6 +17,10 @@ import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
 import com.project.t_story_copy_project.feed.models.vo.*;
 import com.project.t_story_copy_project.security.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +40,13 @@ public class FeedService {
     private final FeedCmtRepository feedCmtRepository;
     private final HashtagRepository hashtagRepository;
     private final FeedPicsRepository feedPicsRepository;
+    private final BlogSubRepository blogSubRepository;
 
     //카테고리 리스트 불러오기
-    public List<CatFeedInfoVo> getCategory(long blogPk){
+    public CatVo getCategory(long blogPk){
         BlogEntity blogEntity = checkUserBlog(blogPk);
 
-        return blogEntity.getCatEntityList().stream()
+        List<CatFeedInfoVo> catFeedInfoVoList = blogEntity.getCatEntityList().stream()
                 .map(catEntity -> {
                     long feedCount = feedRepository.countByCatEntity(catEntity);
                     if (!catEntity.getCatEntityList().isEmpty()){
@@ -67,6 +73,11 @@ public class FeedService {
                             ).build();
                 })
                 .toList();
+        return CatVo.builder()
+                .catAll("전체")
+                .feedCount(feedRepository.countAllByBlogEntity(blogEntity))
+                .catFeedInfoVoList(catFeedInfoVoList)
+                .build();
     }
     //카테고리 이름 pk 불러오기
     public List<CatSimpleVo> getCategoryList(Long blogPk){
@@ -237,8 +248,77 @@ public class FeedService {
             }
         }
         feedCmtRepository.delete(feedCommentEntity);
+
         return new ResVo(1L);
     }
+
+    //피드 리스트
+    public FeedSimpleInfoVoList getFeedAll (Pageable pageable){
+        Page<FeedEntity> feedEntities = feedRepository.findAllByCompleteAndFeedPrivateOrderByCreatedAtDesc(Const.FEED_POST_COMPLETE, Const.PUBLIC,pageable);
+
+        return FeedSimpleInfoVoList.builder()
+                .maxPage((long) feedEntities.getTotalPages())
+                .hasNext(feedEntities.hasNext())
+                .hasPrevious(feedEntities.hasPrevious())
+                .feedSimpleInfoVoList(feedEntities.getContent().stream().map(
+                        feedEntity -> {
+                            String html = feedEntity.getContents();
+                            Document doc = Jsoup.parse(html);
+                            String contents = doc.body().text();
+                            return FeedSimpleInfoVo.builder()
+                                .feedPk(feedEntity.getFeedPk())
+                                .feedTitle(feedEntity.getTitle())
+                                .feedContent(contents)
+                                .feedImg(feedEntity.getFeedPicsEntityList().isEmpty() ? null :
+                                        feedEntity.getFeedPicsEntityList().get(0).getFeedPic())
+                                .favCount(feedFavRepository.countByFeedEntity(feedEntity))
+                                .cmtCount(feedCmtRepository.countByFeedEntity(feedEntity))
+                                .createdAt(feedEntity.getCreatedAt().toString())
+                                .hashTagList(hashtagRepository.findTop3ByFeedEntity(feedEntity).stream()
+                                        .map(HashTagEntity::getHashTagNm).toList())
+                                .blogPk(feedEntity.getBlogEntity().getBlogPk())
+                                .blogTitle(feedEntity.getBlogEntity().getBlogTitle())
+                                .blogImg(feedEntity.getBlogEntity().getBlogPic())
+                                .build();}
+                ).toList(
+                )).build();
+
+    }
+    //구독한 블로그의 피드 리스트
+    public FeedSimpleInfoVoList getFeedSub(Pageable pageable){
+        UserEntity userEntity = checkUser();
+        List<BlogEntity> blogEntityList = blogSubRepository.findAllByUserEntity(userEntity).stream().map(BlogSubEntity::getBlogEntity).toList();
+        Page<FeedEntity> feedEntities = feedRepository.findAllByCompleteAndFeedPrivateAndBlogEntityInOrderByCreatedAtDesc(Const.FEED_POST_COMPLETE, Const.PUBLIC, blogEntityList, pageable);
+        return FeedSimpleInfoVoList.builder()
+                .maxPage((long) feedEntities.getTotalPages())
+                .hasNext(feedEntities.hasNext())
+                .hasPrevious(feedEntities.hasPrevious())
+                .feedSimpleInfoVoList(feedEntities.getContent().stream().map(
+                        feedEntity -> {
+                            String html = feedEntity.getContents();
+                            Document doc = Jsoup.parse(html);
+                            String contents = doc.body().text();
+                            return FeedSimpleInfoVo.builder()
+                                    .feedPk(feedEntity.getFeedPk())
+                                    .feedTitle(feedEntity.getTitle())
+                                    .feedContent(contents)
+                                    .feedImg(feedEntity.getFeedPicsEntityList().isEmpty() ? null :
+                                            feedEntity.getFeedPicsEntityList().get(0).getFeedPic())
+                                    .favCount(feedFavRepository.countByFeedEntity(feedEntity))
+                                    .cmtCount(feedCmtRepository.countByFeedEntity(feedEntity))
+                                    .createdAt(feedEntity.getCreatedAt().toString())
+                                    .hashTagList(hashtagRepository.findTop3ByFeedEntity(feedEntity).stream()
+                                            .map(HashTagEntity::getHashTagNm).toList())
+                                    .blogPk(feedEntity.getBlogEntity().getBlogPk())
+                                    .blogTitle(feedEntity.getBlogEntity().getBlogTitle())
+                                    .blogImg(feedEntity.getBlogEntity().getBlogPic())
+                                    .build();}
+                ).toList(
+                )).build();
+
+
+    }
+
 
 
 //===============================================================================================================================

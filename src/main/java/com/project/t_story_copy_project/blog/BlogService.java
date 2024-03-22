@@ -7,14 +7,18 @@ import com.project.t_story_copy_project.blog.models.dto.CatInsDto;
 import com.project.t_story_copy_project.blog.models.vo.BlogInfoVo;
 import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
 import com.project.t_story_copy_project.blog.models.vo.CatSubInfoVo;
+import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.entity.BlogEntity;
+import com.project.t_story_copy_project.commom.entity.BlogSubEntity;
 import com.project.t_story_copy_project.commom.entity.CatEntity;
 import com.project.t_story_copy_project.commom.entity.UserEntity;
+import com.project.t_story_copy_project.commom.entity.embeddable.BlogSubComposite;
 import com.project.t_story_copy_project.commom.exception.BlogErrorCode;
 import com.project.t_story_copy_project.commom.exception.CatErrorCode;
 import com.project.t_story_copy_project.commom.exception.CustomException;
 import com.project.t_story_copy_project.commom.exception.UserErrorCode;
 import com.project.t_story_copy_project.commom.repository.BlogRepository;
+import com.project.t_story_copy_project.commom.repository.BlogSubRepository;
 import com.project.t_story_copy_project.commom.repository.CatRepository;
 import com.project.t_story_copy_project.commom.repository.UserRepository;
 import com.project.t_story_copy_project.commom.utils.MyFileUtils;
@@ -37,6 +41,7 @@ public class BlogService {
     private final BlogRepository blogRepository;
     private final UserRepository userRepository;
     private final CatRepository catRepository;
+    private final BlogSubRepository blogSubRepository;
     @Transactional
     public BlogInfoVo registerBlog(BlogRegisterDto dto, MultipartFile blogProfileImg){
         log.info("getLoginUserPk : {}", authenticationFacade.getLoginUserPk());
@@ -163,6 +168,30 @@ public class BlogService {
     public Long cmtAccess(long blogPk){
         BlogEntity blogEntity = checkUserBlog(blogPk);
         return blogEntity.cmtAccess();
+    }
+
+    //블로그 구독
+    public ResVo subscribe(long blogPk){
+        BlogEntity blogEntity = blogRepository.findById(blogPk)
+                .orElseThrow(() -> new CustomException(BlogErrorCode.NOT_FOUND_BLOG));
+        UserEntity userEntity = checkUser();
+        BlogSubComposite blogSubComposite = BlogSubComposite.builder()
+                .blogPk(blogPk)
+                .userPk(userEntity.getUserPk())
+                .build();
+        if (blogSubRepository.findById(blogSubComposite).isPresent()){
+            blogSubRepository.deleteById(blogSubComposite);
+            return new ResVo(2L);
+        }
+        else {
+            BlogSubEntity blogSubEntity = BlogSubEntity.builder()
+                    .blogSubComposite(blogSubComposite)
+                    .blogEntity(blogEntity)
+                    .userEntity(userEntity)
+                    .build();
+            blogSubRepository.save(blogSubEntity);
+            return new ResVo(1L);
+        }
     }
 
 
