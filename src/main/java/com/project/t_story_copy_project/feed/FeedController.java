@@ -3,7 +3,9 @@ package com.project.t_story_copy_project.feed;
 import com.project.t_story_copy_project.blog.models.vo.CatInfoVo;
 import com.project.t_story_copy_project.commom.ResVo;
 import com.project.t_story_copy_project.commom.exception.CustomResponse;
+import com.project.t_story_copy_project.feed.models.dto.CmtDelGuestDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedCmtInsDto;
+import com.project.t_story_copy_project.feed.models.dto.FeedCmtPutDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
 import com.project.t_story_copy_project.feed.models.vo.CatFeedInfoVo;
 import com.project.t_story_copy_project.feed.models.vo.CatSimpleVo;
@@ -70,5 +72,17 @@ public class FeedController {
     @PostMapping("/cmt")
     public ResponseEntity<CustomResponse<ResVo>> postFeedCmt(@RequestBody FeedCmtInsDto dto){
         return ResponseEntity.ok(new CustomResponse<>(feedService.postFeedCmt(dto)));
+    }
+
+    //피드 댓글 수정
+    @PutMapping("/cmt")
+    public ResponseEntity<CustomResponse<ResVo>> putFeedCmt(@RequestBody FeedCmtPutDto dto){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.putFeedCmt(dto)));
+    }
+
+    //피드 댓글 삭제
+    @DeleteMapping("/cmt")
+    public ResponseEntity<CustomResponse<ResVo>> deleteFeedCmt(@RequestParam Long feedCmtPk, @RequestBody String guestPw){
+        return ResponseEntity.ok(new CustomResponse<>(feedService.deleteFeedCmt(feedCmtPk, guestPw)));
     }
 }

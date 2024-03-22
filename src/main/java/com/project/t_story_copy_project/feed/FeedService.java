@@ -9,7 +9,9 @@ import com.project.t_story_copy_project.commom.exception.FeedErrorCode;
 import com.project.t_story_copy_project.commom.exception.UserErrorCode;
 import com.project.t_story_copy_project.commom.repository.*;
 import com.project.t_story_copy_project.commom.utils.MyFileUtils;
+import com.project.t_story_copy_project.feed.models.dto.CmtDelGuestDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedCmtInsDto;
+import com.project.t_story_copy_project.feed.models.dto.FeedCmtPutDto;
 import com.project.t_story_copy_project.feed.models.dto.FeedInsDto;
 import com.project.t_story_copy_project.feed.models.vo.*;
 import com.project.t_story_copy_project.security.AuthenticationFacade;
@@ -206,9 +208,40 @@ public class FeedService {
             return new ResVo(1L);
         }
     }
+    //피드 댓글 수정
+    public ResVo putFeedCmt(FeedCmtPutDto dto){
+        UserEntity userEntity = userRepository.findById(authenticationFacade.getLoginUserPk())
+                .orElse(null);
+        FeedCommentEntity feedCommentEntity = feedCmtRepository.findById(dto.getCmtPk())
+                .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED_CMT));
+        if (userEntity == null){
+            if (!feedCommentEntity.getCmtPw().equals(dto.getCmtPw())){
+                throw new CustomException(FeedErrorCode.MISS_MATCH_PW);
+            }
+        }
+        feedCommentEntity.modifyFeedComment(dto);
+        feedCmtRepository.save(feedCommentEntity);
+        return new ResVo(1L);
+
+    }
+
+    public ResVo deleteFeedCmt(long cmtPk , String cmtPw){
+        UserEntity userEntity = userRepository.findById(authenticationFacade.getLoginUserPk())
+                .orElse(null);
+        FeedCommentEntity feedCommentEntity = feedCmtRepository.findById(cmtPk)
+                .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED_CMT));
+
+        if (userEntity == null){
+            if (!feedCommentEntity.getCmtPw().equals(cmtPw)){
+                throw new CustomException(FeedErrorCode.MISS_MATCH_PW);
+            }
+        }
+        feedCmtRepository.delete(feedCommentEntity);
+        return new ResVo(1L);
+    }
 
 
-
+//===============================================================================================================================
     private FeedEntity checkUserFeed(long feedPk, long blogPk){
         FeedEntity feedEntity = feedRepository.findById(feedPk)
                 .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED));

@@ -1,6 +1,7 @@
 package com.project.t_story_copy_project.commom.entity;
 
 import com.project.t_story_copy_project.commom.entity.base.BaseEntity;
+import com.project.t_story_copy_project.feed.models.dto.FeedCmtPutDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,5 +39,10 @@ public class FeedCommentEntity extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("'0'")
     private Long cmtPrivate;
+
+    public void modifyFeedComment(FeedCmtPutDto dto){
+        this.cmt = dto.getCmt();
+        this.cmtPrivate = dto.getCmtPrivate();
+    }
 
 }
