@@ -34,7 +34,7 @@ public class UserController {
         CustomResponse<UserLoginVo> customResponse = new CustomResponse<>(userLoginVo);
         return ResponseEntity.ok(customResponse);
     }
-    @PatchMapping("/profile-pic")
+    @PatchMapping("/profile-pic")//유저 프로필 사진 변경
     public ResponseEntity<CustomResponse<String>> changeProfilePic(@RequestPart MultipartFile profileImg){
         String saveFile = userService.changeProfilePic(profileImg);
         CustomResponse<String> customResponse = new CustomResponse<>(saveFile);

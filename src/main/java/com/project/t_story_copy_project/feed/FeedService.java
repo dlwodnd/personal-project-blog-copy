@@ -185,6 +185,7 @@ public class FeedService {
         }
 
     }
+    //피드 댓글 등록
     public ResVo postFeedCmt(FeedCmtInsDto dto) {
         FeedEntity feedEntity = feedRepository.findById(dto.getFeedPk())
                 .orElseThrow(() -> new CustomException(FeedErrorCode.NOT_FOUND_FEED));

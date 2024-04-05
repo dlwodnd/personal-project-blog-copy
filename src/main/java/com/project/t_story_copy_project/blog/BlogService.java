@@ -87,7 +87,7 @@ public class BlogService {
         blogRepository.delete(blogEntity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CatInfoVo> registerCategory(CatInsDto dto){
 
         BlogEntity blogEntity = checkUserBlog(dto.getBlogPk());
